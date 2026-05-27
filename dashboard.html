@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinTrack Pro - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f2f3ff",
+                      "secondary": "#006e2f",
+                      "tertiary-fixed": "#ffdad7",
+                      "on-primary-fixed-variant": "#0038b6",
+                      "inverse-surface": "#283044",
+                      "secondary-container": "#6bff8f",
+                      "inverse-on-surface": "#eef0ff",
+                      "on-primary": "#ffffff",
+                      "outline": "#737688",
+                      "primary": "#003ec7",
+                      "surface-container-highest": "#dae2fd",
+                      "on-tertiary-container": "#ffddda",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#dde1ff",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#001452",
+                      "tertiary": "#a10016",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#005321",
+                      "outline-variant": "#c3c5d9",
+                      "surface-variant": "#dae2fd",
+                      "secondary-fixed": "#6bff8f",
+                      "surface": "#faf8ff",
+                      "on-secondary-container": "#007432",
+                      "inverse-primary": "#b7c4ff",
+                      "tertiary-fixed-dim": "#ffb3ad",
+                      "primary-fixed-dim": "#b7c4ff",
+                      "secondary-fixed-dim": "#4ae176",
+                      "on-tertiary-fixed": "#410004",
+                      "primary-container": "#0052ff",
+                      "on-primary-container": "#dfe3ff",
+                      "on-surface-variant": "#434656",
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#c5242b",
+                      "on-tertiary-fixed-variant": "#930013",
+                      "surface-dim": "#d2d9f4",
+                      "surface-bright": "#faf8ff",
+                      "surface-container": "#eaedff",
+                      "background": "#faf8ff",
+                      "surface-container-high": "#e2e7ff",
+                      "on-surface": "#131b2e",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#004ced",
+                      "on-secondary-fixed": "#002109",
+                      "error-container": "#ffdad6",
+                      "on-background": "#131b2e",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.5rem",
+                      "lg": "1rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "32px",
+                      "2xl": "48px",
+                      "margin-mobile": "16px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ambient-shadow-sm {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .ambient-shadow-md {
+            box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.10);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<!-- Chart.js for demo purposes -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar (Desktop only based on layout rules) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface dark:bg-inverse-surface shadow-sm dark:shadow-none flex flex-col h-full border-r border-outline-variant dark:border-outline z-50 hidden md:flex">
+<!-- Header -->
+<div class="p-lg border-b border-outline-variant/30 flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container text-2xl">account_balance_wallet</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">FinTrack Pro</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Premium Account</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 overflow-y-auto py-md px-sm space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary dark:text-primary-fixed font-bold border-r-2 border-primary dark:border-primary-fixed bg-surface-container-low transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined icon-fill">dashboard</span>
+<span class="font-body-sm text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-body-sm text-body-sm">Transactions</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">category</span>
+<span class="font-body-sm text-body-sm">Categories</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-body-sm text-body-sm">Reports</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+</nav>
+<!-- CTA & Footer -->
+<div class="p-lg border-t border-outline-variant/30 flex flex-col gap-md">
+<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-sm transition-colors duration-150 ease-in-out ambient-shadow-sm">
+<span class="material-symbols-outlined">add</span>
+                Quick Add
+            </button>
+<div class="space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-sm text-body-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-sm text-body-sm">Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-[280px] h-full w-full">
+<!-- TopNavBar (Visible on all, structural adjustments per device) -->
+<header class="bg-surface-container-lowest dark:bg-surface-dim shadow-sm dark:shadow-none flex justify-between items-center w-full h-16 px-margin-desktop sticky top-0 z-40 border-b border-outline-variant/20">
+<!-- Mobile Brand (Hidden on desktop as SideNav handles it) -->
+<div class="md:hidden flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-2xl">account_balance_wallet</span>
+<span class="font-headline-sm text-headline-sm font-black text-on-surface dark:text-inverse-on-surface">FinTrack Pro</span>
+</div>
+<!-- Empty div for flex spacing on desktop -->
+<div class="hidden md:block flex-1"></div>
+<!-- Actions -->
+<div class="flex items-center gap-md">
+<button class="p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors duration-150 ease-in-out">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors duration-150 ease-in-out relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-sm rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors duration-150 ease-in-out hidden md:block">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/50 hidden md:block mx-sm"></div>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-150 ease-in-out hidden md:block">
+                    Support
+                </button>
+<button class="flex items-center gap-sm ml-sm hover:scale-95 active:scale-100 transition-transform duration-150 ease-in-out">
+<img alt="User avatar" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="Professional headshot of a person looking forward against a neutral background. Lighting is soft and even, highlighting a friendly expression. The overall style is clean, corporate, and modern, suitable for a professional software avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxLQCQkSGdNKfKRIu5ZSuz_5nYOsBITJ7QQr_AQewMEiO6qiKYLFFB4QMd3Lya9zGNwe1Kned_bQvmW_CkSbUWCuy6EsRzWwG0Kh9RIMNMVxZWBd7awf95duhPYvUWaHCKdILz_h18n8q4Mm7LAGL1z1O220lJOdtOWgrRsCMlPIVixRUTL_cBXnCNjrimvPWW7JER03_UyVr66lL_uC9xNoe--lo5CoLtvU-PKBo7KmFnn7gJkys6fA7K3BRK_hKdSbtN90YATys"/>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 overflow-y-auto bg-background p-margin-mobile md:p-margin-desktop">
+<div class="max-w-[1440px] mx-auto space-y-gutter">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Dashboard Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Welcome back, here's your financial summary.</p>
+</div>
+<!-- Mobile Quick Add -->
+<button class="md:hidden w-full bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-sm transition-colors duration-150 ease-in-out ambient-shadow-sm">
+<span class="material-symbols-outlined">add</span>
+                        Quick Add
+                    </button>
+</div>
+<!-- Summary Cards (Bento style grid) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Total Balance -->
+<div class="bg-surface rounded-xl p-lg ambient-shadow-sm border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-xl">account_balance</span>
+                                Total Balance
+                            </p>
+<h3 class="font-display-lg text-display-lg text-on-surface mt-sm">$124,560.00</h3>
+</div>
+<div class="mt-md flex items-center gap-sm">
+<span class="inline-flex items-center bg-secondary/10 text-secondary font-label-sm text-label-sm px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px] mr-1">trending_up</span> +2.4%
+                            </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">vs last month</span>
+</div>
+</div>
+<!-- Monthly Income -->
+<div class="bg-surface rounded-xl p-lg ambient-shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-xl">arrow_downward</span>
+                                Monthly Income
+                            </p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-sm">$12,450.00</h3>
+</div>
+<div class="mt-md w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full w-[75%]"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">75% of monthly goal</p>
+</div>
+<!-- Monthly Expenses -->
+<div class="bg-surface rounded-xl p-lg ambient-shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-xl">arrow_upward</span>
+                                Monthly Expenses
+                            </p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mt-sm">$4,230.50</h3>
+</div>
+<div class="mt-md w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full w-[40%]"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">40% of budget limit</p>
+</div>
+</div>
+<!-- Main Analytics Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Line Chart Column (Spans 2) -->
+<div class="lg:col-span-2 bg-surface rounded-xl p-lg ambient-shadow-sm border border-outline-variant/30">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Cash Flow</h3>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="relative h-[300px] w-full">
+<canvas id="cashFlowChart"></canvas>
+</div>
+</div>
+<!-- Doughnut Chart Column (Spans 1) -->
+<div class="bg-surface rounded-xl p-lg ambient-shadow-sm border border-outline-variant/30 flex flex-col">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Top Categories</h3>
+</div>
+<div class="relative flex-1 min-h-[250px] flex items-center justify-center">
+<canvas id="categoriesChart"></canvas>
+</div>
+<div class="mt-md space-y-sm">
+<div class="flex justify-between items-center font-body-sm text-body-sm">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-primary"></span> Housing</div>
+<span class="font-medium">$1,500</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-[#0ea5e9]"></span> Food</div>
+<span class="font-medium">$850</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-secondary"></span> Utilities</div>
+<span class="font-medium">$420</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Transactions Section -->
+<div class="bg-surface rounded-xl ambient-shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="p-lg border-b border-outline-variant/30 flex justify-between items-center bg-surface-bright">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Transactions</h3>
+<a class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="p-md font-medium">Vendor</th>
+<th class="p-md font-medium">Category</th>
+<th class="p-md font-medium">Date</th>
+<th class="p-md font-medium text-right">Amount</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm divide-y divide-outline-variant/20">
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<span class="font-medium text-on-surface">Whole Foods Market</span>
+</td>
+<td class="p-md text-on-surface-variant">Groceries</td>
+<td class="p-md text-on-surface-variant">Oct 24, 2023</td>
+<td class="p-md text-right font-medium text-on-surface">-$142.50</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary/20 transition-colors">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="font-medium text-on-surface">TechCorp Salary</span>
+</td>
+<td class="p-md text-on-surface-variant">Income</td>
+<td class="p-md text-on-surface-variant">Oct 22, 2023</td>
+<td class="p-md text-right font-medium text-secondary">+$6,200.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-[#0ea5e9]/10 flex items-center justify-center text-[#0ea5e9] group-hover:bg-[#0ea5e9]/20 transition-colors">
+<span class="material-symbols-outlined">flash_on</span>
+</div>
+<span class="font-medium text-on-surface">City Power &amp; Light</span>
+</td>
+<td class="p-md text-on-surface-variant">Utilities</td>
+<td class="p-md text-on-surface-variant">Oct 20, 2023</td>
+<td class="p-md text-right font-medium text-on-surface">-$124.00</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary group-hover:bg-tertiary-container transition-colors">
+<span class="material-symbols-outlined">local_cafe</span>
+</div>
+<span class="font-medium text-on-surface">Starbucks</span>
+</td>
+<td class="p-md text-on-surface-variant">Dining</td>
+<td class="p-md text-on-surface-variant">Oct 19, 2023</td>
+<td class="p-md text-right font-medium text-on-surface">-$6.50</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 group-hover:bg-purple-500/20 transition-colors">
+<span class="material-symbols-outlined">subscriptions</span>
+</div>
+<span class="font-medium text-on-surface">Netflix</span>
+</td>
+<td class="p-md text-on-surface-variant">Entertainment</td>
+<td class="p-md text-on-surface-variant">Oct 18, 2023</td>
+<td class="p-md text-right font-medium text-on-surface">-$15.99</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Chart Initialization Script -->
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Chart Defaults
+            Chart.defaults.font.family = 'Inter, sans-serif';
+            Chart.defaults.color = '#737688';
+            
+            // Cash Flow Chart (Line)
+            const ctxLine = document.getElementById('cashFlowChart').getContext('2d');
+            
+            // Create gradient for income
+            let incomeGradient = ctxLine.createLinearGradient(0, 0, 0, 300);
+            incomeGradient.addColorStop(0, 'rgba(0, 62, 199, 0.2)'); // primary
+            incomeGradient.addColorStop(1, 'rgba(0, 62, 199, 0)');
+
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [4200, 4800, 5100, 4900, 5800, 5500, 6200],
+                            borderColor: '#003ec7', // primary
+                            backgroundColor: incomeGradient,
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#003ec7',
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [3100, 3400, 3200, 3800, 3500, 4100, 3900],
+                            borderColor: '#ba1a1a', // error
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            fill: false,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#ba1a1a',
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(195, 197, 217, 0.2)', // outline-variant
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            });
+
+            // Top Categories Chart (Doughnut)
+            const ctxDoughnut = document.getElementById('categoriesChart').getContext('2d');
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Housing', 'Food', 'Utilities', 'Other'],
+                    datasets: [{
+                        data: [1500, 850, 420, 600],
+                        backgroundColor: [
+                            '#003ec7', // primary
+                            '#0ea5e9', // light blue custom
+                            '#006e2f', // secondary
+                            '#e2e7ff'  // surface-container-high
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            display: false // Using custom legend HTML below chart
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body></html>

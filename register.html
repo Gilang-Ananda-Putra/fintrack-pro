@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Register - FinTrack Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#f2f3ff",
+                      "secondary": "#006e2f",
+                      "tertiary-fixed": "#ffdad7",
+                      "on-primary-fixed-variant": "#0038b6",
+                      "inverse-surface": "#283044",
+                      "secondary-container": "#6bff8f",
+                      "inverse-on-surface": "#eef0ff",
+                      "on-primary": "#ffffff",
+                      "outline": "#737688",
+                      "primary": "#003ec7",
+                      "surface-container-highest": "#dae2fd",
+                      "on-tertiary-container": "#ffddda",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#dde1ff",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#001452",
+                      "tertiary": "#a10016",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#005321",
+                      "outline-variant": "#c3c5d9",
+                      "surface-variant": "#dae2fd",
+                      "secondary-fixed": "#6bff8f",
+                      "surface": "#faf8ff",
+                      "on-secondary-container": "#007432",
+                      "inverse-primary": "#b7c4ff",
+                      "tertiary-fixed-dim": "#ffb3ad",
+                      "primary-fixed-dim": "#b7c4ff",
+                      "secondary-fixed-dim": "#4ae176",
+                      "on-tertiary-fixed": "#410004",
+                      "primary-container": "#0052ff",
+                      "on-primary-container": "#dfe3ff",
+                      "on-surface-variant": "#434656",
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#c5242b",
+                      "on-tertiary-fixed-variant": "#930013",
+                      "surface-dim": "#d2d9f4",
+                      "surface-bright": "#faf8ff",
+                      "surface-container": "#eaedff",
+                      "background": "#faf8ff",
+                      "surface-container-high": "#e2e7ff",
+                      "on-surface": "#131b2e",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#004ced",
+                      "on-secondary-fixed": "#002109",
+                      "error-container": "#ffdad6",
+                      "on-background": "#131b2e",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.5rem",
+                      "lg": "1rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "32px",
+                      "2xl": "48px",
+                      "margin-mobile": "16px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface-container-lowest min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- Split Layout Container -->
+<div class="flex min-h-full w-full">
+<!-- Left Visual Side -->
+<div class="relative hidden w-0 flex-1 lg:block bg-surface-container-low">
+<img alt="Abstract geometric shapes" class="absolute inset-0 h-full w-full object-cover" data-alt="A minimalist, abstract 3D rendering of floating glass panels and geometric data charts suspended in a bright, airy studio space. The lighting is soft, high-key, and diffused, creating a premium corporate aesthetic. The color palette features pristine whites, light silver-grays, and subtle gradients of deep professional blue. The mood is calm, precise, and technologically sophisticated, perfectly suited for a high-end financial dashboard registration page." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhwMmlpDHD7t8JjxhrOQOvzDLzHnmiNmWK_1DuwfD1gojyRi_523uhGHIex-JzQdfrRWGtcEGuL34yUAwwI9RV_wY7sOH1QKCBmHfaPB_Rah4eaMMSApdtRNa4dFnemHTcI55cmTMzOty9zV2104y3xz73mG91hjEd8AEDwDfbNv15A6YXLmsi-Ks-E90UBF3FnlgKWqg82GyAbn7gpIp28C9utRMmqpnWRWnZS8IpIVysZN1JNeOKV3tBGjSdIvulHjGA3iEPrzk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent mix-blend-multiply"></div>
+<div class="absolute bottom-12 left-12 right-12 text-inverse-on-surface">
+<h2 class="font-display-lg text-display-lg mb-4 text-on-primary">Precision in every transaction.</h2>
+<p class="font-body-lg text-body-lg text-primary-fixed max-w-xl">Join thousands of professionals who trust FinTrack Pro for their high-stakes financial clarity and uncompromised data security.</p>
+</div>
+</div>
+<!-- Right Form Side -->
+<div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+<div class="mx-auto w-full max-w-sm lg:w-96">
+<!-- Brand / Header -->
+<div>
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">insert_chart</span>
+<span class="font-headline-sm text-headline-sm font-black text-on-surface tracking-tight">FinTrack Pro</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-6">Create your account</h2>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant">
+                        Already have an account? 
+                        <a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors duration-150" href="#">Sign in here</a>
+</p>
+</div>
+<!-- Registration Form -->
+<div class="mt-8">
+<form action="#" class="space-y-6" method="POST">
+<!-- Full Name -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="name">Full Name</label>
+<div class="mt-1">
+<input autocomplete="name" class="block w-full appearance-none rounded-lg border border-outline-variant px-4 py-3 bg-surface text-on-surface font-body-md shadow-sm placeholder:text-outline focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0 sm:text-sm transition-all duration-150" id="name" name="name" placeholder="Jane Doe" required="" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="email">Email address</label>
+<div class="mt-1">
+<input autocomplete="email" class="block w-full appearance-none rounded-lg border border-outline-variant px-4 py-3 bg-surface text-on-surface font-body-md shadow-sm placeholder:text-outline focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0 sm:text-sm transition-all duration-150" id="email" name="email" placeholder="jane@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="password">Password</label>
+<div class="mt-1">
+<input class="block w-full appearance-none rounded-lg border border-outline-variant px-4 py-3 bg-surface text-on-surface font-body-md shadow-sm placeholder:text-outline focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0 sm:text-sm transition-all duration-150" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Confirm Password -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="confirm-password">Confirm Password</label>
+<div class="mt-1">
+<input class="block w-full appearance-none rounded-lg border border-outline-variant px-4 py-3 bg-surface text-on-surface font-body-md shadow-sm placeholder:text-outline focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0 sm:text-sm transition-all duration-150" id="confirm-password" name="confirm-password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Terms Checkbox -->
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface transition-colors duration-150 cursor-pointer" id="terms" name="terms" required="" type="checkbox"/>
+<label class="ml-3 block font-body-sm text-body-sm text-on-surface-variant cursor-pointer select-none" for="terms">
+                                I agree to the 
+                                <a class="font-label-md text-label-md text-primary hover:underline" href="#">Terms &amp; Conditions</a>
+                                and
+                                <a class="font-label-md text-label-md text-primary hover:underline" href="#">Privacy Policy</a>.
+                            </label>
+</div>
+<!-- Submit Button -->
+<div>
+<button class="flex w-full justify-center rounded-lg bg-primary px-4 py-3 font-label-md text-label-md text-on-primary shadow-sm hover:bg-on-primary-fixed-variant focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all duration-150 ease-in-out active:scale-[0.98]" type="submit">
+                                Create Account
+                            </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</body></html>
