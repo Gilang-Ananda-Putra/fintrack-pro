@@ -1,0 +1,14 @@
+:root {
+    --font-primary: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    margin: 0;
+    background-color: #f8fafc;
+    color: #0f172a;
+}

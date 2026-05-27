@@ -1,12 +1,14 @@
 <?php
 
-function redirect($path)
+declare(strict_types=1);
+
+function redirect(string $path): void
 {
-    header("Location: " . $path);
+    header('Location: ' . $path);
     exit;
 }
 
-function formatRupiah($number)
+function formatRupiah(float|int $number): string
 {
     return 'Rp ' . number_format($number, 0, ',', '.');
 }
