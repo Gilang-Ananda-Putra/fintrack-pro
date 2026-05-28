@@ -38,6 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $error = 'Semua field wajib diisi.';
 
+    // Validasi keamanan password
+    } elseif (
+        $error === '' &&
+        (
+            strlen($password) < 8 ||
+            !preg_match('/[A-Za-z]/', $password) ||
+            !preg_match('/\d/', $password)
+        )
+    ) {
+
+        $error = 'Password minimal 8 karakter dan harus mengandung minimal 1 huruf serta 1 angka.';
+
     // Validasi konfirmasi password
     } elseif ($error === '' && $password !== $confirm_password) {
 
