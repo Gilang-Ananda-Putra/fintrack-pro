@@ -1,136 +1,20 @@
 <?php
-
 declare(strict_types=1);
-
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/database.php';
-
-$userId = (int) ($_SESSION['user_id'] ?? 0);
-
-$totalIncome = 0.0;
-$totalExpense = 0.0;
-$currentBalance = 0.0;
-$recentTransactions = [];
-
-$summaryStmt = $pdo->prepare(
-    "SELECT
-        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS total_income,
-        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS total_expense
-     FROM transactions
-     WHERE user_id = :user_id"
-);
-$summaryStmt->execute(['user_id' => $userId]);
-$summary = $summaryStmt->fetch();
-
-if (is_array($summary)) {
-    $totalIncome = (float) ($summary['total_income'] ?? 0);
-    $totalExpense = (float) ($summary['total_expense'] ?? 0);
-}
-
-$currentBalance = $totalIncome - $totalExpense;
-
-$transactionStmt = $pdo->prepare(
-    "SELECT
-        t.title,
-        t.amount,
-        t.type,
-        t.transaction_date,
-        c.name AS category_name
-     FROM transactions t
-     LEFT JOIN categories c ON c.id = t.category_id
-     WHERE t.user_id = :user_id
-     ORDER BY t.transaction_date DESC, t.id DESC
-     LIMIT 8"
-);
-$transactionStmt->execute(['user_id' => $userId]);
-$recentTransactions = $transactionStmt->fetchAll();
-
-$currency = static fn (float $amount): string => 'Rp ' . number_format($amount, 2, ',', '.');
+$userId=(int)($_SESSION['user_id']??0);
+$summary=$pdo->prepare("SELECT COALESCE(SUM(CASE WHEN type='income' THEN amount ELSE 0 END),0) total_income, COALESCE(SUM(CASE WHEN type='expense' THEN amount ELSE 0 END),0) total_expense FROM transactions WHERE user_id=:user_id");$summary->execute(['user_id'=>$userId]);$sum=$summary->fetch()?:[];$totalIncome=(float)($sum['total_income']??0);$totalExpense=(float)($sum['total_expense']??0);$currentBalance=$totalIncome-$totalExpense;
+$recent=$pdo->prepare("SELECT t.title,t.amount,t.type,t.transaction_date,c.name category_name FROM transactions t LEFT JOIN categories c ON c.id=t.category_id WHERE t.user_id=:user_id ORDER BY t.transaction_date DESC,t.id DESC LIMIT 6");$recent->execute(['user_id'=>$userId]);$recentTransactions=$recent->fetchAll();
+$monthly=$pdo->prepare("SELECT DATE_FORMAT(transaction_date,'%Y-%m') ym, SUM(CASE WHEN type='income' THEN amount ELSE 0 END) income, SUM(CASE WHEN type='expense' THEN amount ELSE 0 END) expense FROM transactions WHERE user_id=:user_id AND transaction_date>=DATE_SUB(CURDATE(), INTERVAL 5 MONTH) GROUP BY ym ORDER BY ym");$monthly->execute(['user_id'=>$userId]);$mrows=$monthly->fetchAll();
+$ml=[];$mi=[];$me=[];foreach($mrows as $r){$ml[]=$r['ym'];$mi[]=(float)$r['income'];$me[]=(float)$r['expense'];}
+$currency=static fn(float $a):string=>'Rp '.number_format($a,2,',','.');
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <?php include __DIR__ . '/../includes/head.php'; ?>
-</head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-<div class="flex min-h-screen">
-    <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-
-    <div class="flex-1 min-w-0">
-        <?php include __DIR__ . '/../includes/topbar.php'; ?>
-
-        <main class="p-4 sm:p-6 lg:p-8">
-            <div class="max-w-7xl mx-auto space-y-6">
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Dashboard</h1>
-                    <p class="text-sm text-slate-500 mt-1">Ringkasan keuangan berdasarkan data transaksi akun Anda.</p>
-                </div>
-
-                <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <article class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                        <p class="text-sm font-medium text-slate-500">Total Income</p>
-                        <p class="mt-2 text-2xl font-bold text-emerald-600"><?= htmlspecialchars($currency($totalIncome), ENT_QUOTES, 'UTF-8'); ?></p>
-                    </article>
-
-                    <article class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                        <p class="text-sm font-medium text-slate-500">Total Expense</p>
-                        <p class="mt-2 text-2xl font-bold text-rose-600"><?= htmlspecialchars($currency($totalExpense), ENT_QUOTES, 'UTF-8'); ?></p>
-                    </article>
-
-                    <article class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm sm:col-span-2 xl:col-span-1">
-                        <p class="text-sm font-medium text-slate-500">Current Balance</p>
-                        <p class="mt-2 text-2xl font-bold <?= $currentBalance >= 0 ? 'text-blue-600' : 'text-amber-600'; ?>">
-                            <?= htmlspecialchars($currency($currentBalance), ENT_QUOTES, 'UTF-8'); ?>
-                        </p>
-                    </article>
-                </section>
-
-                <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-slate-900">Recent Transactions</h2>
-                        <a href="../transactions/index.php" class="text-sm font-medium text-blue-600 hover:text-blue-700">View all</a>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wide text-xs">
-                            <tr>
-                                <th class="text-left px-5 py-3">Title</th>
-                                <th class="text-left px-5 py-3">Category</th>
-                                <th class="text-left px-5 py-3">Date</th>
-                                <th class="text-right px-5 py-3">Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200">
-                            <?php if (count($recentTransactions) === 0): ?>
-                                <tr>
-                                    <td colspan="4" class="px-5 py-8 text-center text-slate-500">Belum ada transaksi untuk ditampilkan.</td>
-                                </tr>
-                            <?php else: ?>
-                                <?php foreach ($recentTransactions as $transaction): ?>
-                                    <?php
-                                    $isIncome = ($transaction['type'] ?? '') === 'income';
-                                    $amount = (float) ($transaction['amount'] ?? 0);
-                                    $categoryName = $transaction['category_name'] ?? '-';
-                                    $transactionDate = $transaction['transaction_date'] ?? '';
-                                    ?>
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="px-5 py-4 font-medium text-slate-900"><?= htmlspecialchars((string) ($transaction['title'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></td>
-                                        <td class="px-5 py-4 text-slate-600"><?= htmlspecialchars((string) $categoryName, ENT_QUOTES, 'UTF-8'); ?></td>
-                                        <td class="px-5 py-4 text-slate-600"><?= htmlspecialchars((string) $transactionDate, ENT_QUOTES, 'UTF-8'); ?></td>
-                                        <td class="px-5 py-4 text-right font-semibold <?= $isIncome ? 'text-emerald-600' : 'text-rose-600'; ?>">
-                                            <?= $isIncome ? '+' : '-'; ?><?= htmlspecialchars($currency($amount), ENT_QUOTES, 'UTF-8'); ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="id"><head><?php $pageTitle='Dashboard — '.APP_NAME; $headExtra='<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>'; include __DIR__.'/../includes/head.php'; ?></head>
+<body class="bg-background text-on-surface min-h-screen"><div class="flex min-h-screen"><?php include __DIR__.'/../includes/sidebar.php'; ?><div class="flex-1 md:ml-[280px]"><?php include __DIR__.'/../includes/topbar.php'; ?><main class="p-4 md:p-8 space-y-6">
+<div><h1 class="text-2xl md:text-3xl font-bold">Dashboard Overview</h1><p class="text-on-surface-variant">Welcome back, here's your financial summary.</p></div>
+<section class="grid md:grid-cols-3 gap-4"><article class="bg-white rounded-xl border border-outline-variant/40 p-5"><p class="text-sm text-on-surface-variant">Total Balance</p><p class="text-3xl font-bold mt-2"><?= htmlspecialchars($currency($currentBalance),ENT_QUOTES,'UTF-8');?></p></article><article class="bg-white rounded-xl border border-outline-variant/40 p-5"><p class="text-sm text-on-surface-variant">Monthly Income</p><p class="text-2xl font-bold text-emerald-600 mt-2"><?= htmlspecialchars($currency($totalIncome),ENT_QUOTES,'UTF-8');?></p></article><article class="bg-white rounded-xl border border-outline-variant/40 p-5"><p class="text-sm text-on-surface-variant">Monthly Expense</p><p class="text-2xl font-bold text-rose-600 mt-2"><?= htmlspecialchars($currency($totalExpense),ENT_QUOTES,'UTF-8');?></p></article></section>
+<section class="grid lg:grid-cols-3 gap-4"><div class="lg:col-span-2 bg-white rounded-xl border border-outline-variant/40 p-5"><h2 class="font-semibold mb-4">Cash Flow (6 Bulan)</h2><canvas id="cashFlowChart" height="120"></canvas></div><div class="bg-white rounded-xl border border-outline-variant/40 p-5"><h2 class="font-semibold mb-4">Income vs Expense</h2><canvas id="donutChart" height="200"></canvas></div></section>
+<section class="bg-white rounded-xl border border-outline-variant/40 overflow-hidden"><div class="px-5 py-4 border-b border-outline-variant/40 font-semibold">Recent Transactions</div><div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-surface-container-low text-on-surface-variant"><tr><th class="px-5 py-3 text-left">Title</th><th class="px-5 py-3 text-left">Category</th><th class="px-5 py-3 text-left">Date</th><th class="px-5 py-3 text-right">Amount</th></tr></thead><tbody><?php foreach($recentTransactions as $t): $inc=($t['type']??'')==='income';?><tr class="border-t border-outline-variant/30"><td class="px-5 py-3"><?= htmlspecialchars((string)($t['title']??'-'),ENT_QUOTES,'UTF-8');?></td><td class="px-5 py-3"><?= htmlspecialchars((string)($t['category_name']??'-'),ENT_QUOTES,'UTF-8');?></td><td class="px-5 py-3"><?= htmlspecialchars((string)($t['transaction_date']??'-'),ENT_QUOTES,'UTF-8');?></td><td class="px-5 py-3 text-right font-semibold <?= $inc?'text-emerald-600':'text-rose-600';?>"><?= $inc?'+':'-';?><?= htmlspecialchars($currency((float)($t['amount']??0)),ENT_QUOTES,'UTF-8');?></td></tr><?php endforeach; ?></tbody></table></div></section>
+</main></div></div>
+<script>new Chart(document.getElementById('cashFlowChart'),{type:'line',data:{labels:<?= json_encode($ml);?>,datasets:[{label:'Income',data:<?= json_encode($mi);?>,borderColor:'#006e2f',backgroundColor:'rgba(0,110,47,.15)',fill:true,tension:.35},{label:'Expense',data:<?= json_encode($me);?>,borderColor:'#ba1a1a',backgroundColor:'rgba(186,26,26,.12)',fill:true,tension:.35}]},options:{plugins:{legend:{position:'bottom'}}}});new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:['Income','Expense'],datasets:[{data:[<?= json_encode($totalIncome);?>,<?= json_encode($totalExpense);?>],backgroundColor:['#006e2f','#ba1a1a']}]},options:{plugins:{legend:{position:'bottom'}}}});</script>
+</body></html>
