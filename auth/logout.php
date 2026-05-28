@@ -1,12 +1,25 @@
 <?php
 
-session_start();
+declare(strict_types=1);
 
+/**
+ * FinTrack Pro — Logout
+ *
+ * Menghapus semua data session dan mengarahkan user ke halaman login.
+ */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../config/app.php';
+
+// Hapus semua variabel session
 $_SESSION = [];
 
+// Hapus cookie session jika ada
 if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
-
     setcookie(
         session_name(),
         '',
@@ -20,5 +33,5 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
-header('Location: login.php');
+header('Location: ' . rtrim(BASE_URL, '/') . '/auth/login.php');
 exit;

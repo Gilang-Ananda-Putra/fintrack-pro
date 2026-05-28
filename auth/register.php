@@ -1,220 +1,218 @@
 <?php
 
-session_start();
+declare(strict_types=1);
 
-require '../config/database.php';
-require '../config/app.php';
-require '../includes/functions.php';
+/**
+ * FinTrack Pro — Register
+ *
+ * Menangani pendaftaran user baru.
+ */
 
-$error = '';
+// Pastikan session dimulai sebelum apapun
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
+
+// Redirect jika sudah login
+if (isset($_SESSION['user_id']) && is_int($_SESSION['user_id']) && $_SESSION['user_id'] > 0) {
+    header('Location: ' . rtrim(BASE_URL, '/') . '/dashboard/index.php');
+    exit;
+}
+
+$error   = '';
 $success = '';
-
-$name = '';
-$email = '';
+$name    = '';
+$email   = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $csrfToken = $_POST['csrf_token'] ?? '';
+    $csrfToken = (string) ($_POST['csrf_token'] ?? '');
 
-    if (!is_string($csrfToken) || !verify_csrf_token($csrfToken)) {
-        $error = 'Token CSRF tidak valid. Silakan coba lagi.';
-    }
+    if (!verify_csrf_token($csrfToken)) {
+        $error = 'Token keamanan tidak valid. Silakan muat ulang halaman dan coba lagi.';
+    } else {
+        // Ambil data form
+        $name             = trim((string) ($_POST['name'] ?? ''));
+        $email            = trim((string) ($_POST['email'] ?? ''));
+        $password         = (string) ($_POST['password'] ?? '');
+        $confirmPassword  = (string) ($_POST['confirm_password'] ?? '');
 
-    // Ambil data form
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
+        // Validasi: semua field wajib diisi
+        if ($name === '' || $email === '' || $password === '' || $confirmPassword === '') {
+            $error = 'Semua field wajib diisi.';
 
-    // Validasi kosong
-    if (
-        $error === '' &&
-        (
-            $name === '' ||
-            $email === '' ||
-            $password === '' ||
-            $confirm_password === ''
-        )
-    ) {
+        // Validasi format email
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Format email tidak valid.';
 
-        $error = 'Semua field wajib diisi.';
-
-    // Validasi keamanan password
-    } elseif (
-        $error === '' &&
-        (
+        // Validasi kekuatan password (minimal 8 karakter, ada huruf & angka)
+        } elseif (
             strlen($password) < 8 ||
             !preg_match('/[A-Za-z]/', $password) ||
             !preg_match('/\d/', $password)
-        )
-    ) {
+        ) {
+            $error = 'Password minimal 8 karakter dan harus mengandung minimal 1 huruf serta 1 angka.';
 
-        $error = 'Password minimal 8 karakter dan harus mengandung minimal 1 huruf serta 1 angka.';
-
-    // Validasi konfirmasi password
-    } elseif ($error === '' && $password !== $confirm_password) {
-
-        $error = 'Konfirmasi password tidak cocok.';
-
-    // Validasi email sudah ada
-    } elseif ($error === '') {
-
-        $checkQuery = 'SELECT id FROM users WHERE email = ? LIMIT 1';
-        $checkStmt = $pdo->prepare($checkQuery);
-        $checkStmt->execute([$email]);
-
-        if ($checkStmt->fetch()) {
-
-            $error = 'Email sudah digunakan.';
+        // Validasi konfirmasi password
+        } elseif (!hash_equals($password, $confirmPassword)) {
+            $error = 'Konfirmasi password tidak cocok.';
 
         } else {
+            // Cek apakah email sudah digunakan
+            $checkStmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+            $checkStmt->execute(['email' => $email]);
 
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $insertQuery = '
-                INSERT INTO users
-                (name, email, password)
-                VALUES (?, ?, ?)
-            ';
-
-            $insertStmt = $pdo->prepare($insertQuery);
-            $isInserted = $insertStmt->execute([
-                $name,
-                $email,
-                $hashedPassword,
-            ]);
-
-            if ($isInserted) {
-                $success = 'Register berhasil. Mengarahkan ke halaman login...';
-                header('Refresh: 2; url=login.php');
+            if ($checkStmt->fetch() !== false) {
+                $error = 'Email sudah digunakan oleh akun lain.';
             } else {
-                $error = 'Terjadi kesalahan saat menyimpan data.';
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+                $insertStmt = $pdo->prepare(
+                    'INSERT INTO users (name, email, password) VALUES (:name, :email, :password)'
+                );
+                $isInserted = $insertStmt->execute([
+                    'name'     => $name,
+                    'email'    => $email,
+                    'password' => $hashedPassword,
+                ]);
+
+                if ($isInserted) {
+                    $success = 'Pendaftaran berhasil! Mengarahkan ke halaman login…';
+                    header('Refresh: 2; url=' . rtrim(BASE_URL, '/') . '/auth/login.php');
+                } else {
+                    $error = 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.';
+                }
             }
-
         }
-
     }
-
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-
-    <?php include '../includes/head.php'; ?>
-
+    <?php
+    $pageTitle = 'Daftar — ' . APP_NAME;
+    include __DIR__ . '/../includes/head.php';
+    ?>
 </head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md">
 
-    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow">
-
-        <h1 class="text-2xl font-bold mb-6 text-center">
-            Register
-        </h1>
-
-        <?php if ($error): ?>
-
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 mb-4">
+                <span class="material-symbols-outlined text-white text-3xl">account_balance_wallet</span>
             </div>
+            <h1 class="text-2xl font-bold text-slate-900"><?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8'); ?></h1>
+            <p class="text-sm text-slate-500 mt-1">Buat akun baru untuk mulai mencatat keuangan Anda</p>
+        </div>
 
-        <?php endif; ?>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
 
-        <?php if ($success): ?>
+            <h2 class="text-xl font-semibold text-slate-900 mb-6">Daftar Akun</h2>
 
-            <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-                <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?>
-            </div>
+            <?php if ($error !== ''): ?>
+                <div class="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 p-4 mb-5 text-sm text-rose-700">
+                    <span class="material-symbols-outlined text-rose-500 text-[18px] mt-0.5 shrink-0">error</span>
+                    <span><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+            <?php endif; ?>
 
-        <?php endif; ?>
+            <?php if ($success !== ''): ?>
+                <div class="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 mb-5 text-sm text-emerald-700">
+                    <span class="material-symbols-outlined text-emerald-500 text-[18px] mt-0.5 shrink-0">check_circle</span>
+                    <span><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+            <?php endif; ?>
 
-        <form method="POST">
-            <input
-                type="hidden"
-                name="csrf_token"
-                value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"
-            >
-
-            <div class="mb-4">
-
-                <label class="block mb-2">
-                    Nama
-                </label>
-
+            <form method="POST" action="" novalidate>
                 <input
-                    type="text"
-                    name="name"
-                    class="w-full border rounded px-4 py-2"
-                    value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>"
+                    type="hidden"
+                    name="csrf_token"
+                    value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"
                 >
 
-            </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="name">
+                        Nama Lengkap
+                    </label>
+                    <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>"
+                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                        placeholder="Nama Anda"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
 
-            <div class="mb-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">
+                        Alamat Email
+                    </label>
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
+                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                        placeholder="contoh@email.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
 
-                <label class="block mb-2">
-                    Email
-                </label>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="password">
+                        Password
+                    </label>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                        placeholder="Min. 8 karakter, ada huruf & angka"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
 
-                <input
-                    type="email"
-                    name="email"
-                    class="w-full border rounded px-4 py-2"
-                    value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="confirm_password">
+                        Konfirmasi Password
+                    </label>
+                    <input
+                        id="confirm_password"
+                        type="password"
+                        name="confirm_password"
+                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                        placeholder="Ulangi password Anda"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition"
+                    <?= $success !== '' ? 'disabled' : ''; ?>
                 >
+                    Daftar Sekarang
+                </button>
+            </form>
 
-            </div>
+        </div>
 
-            <div class="mb-4">
-
-                <label class="block mb-2">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    name="password"
-                    class="w-full border rounded px-4 py-2"
-                >
-
-            </div>
-
-            <div class="mb-6">
-
-                <label class="block mb-2">
-                    Confirm Password
-                </label>
-
-                <input
-                    type="password"
-                    name="confirm_password"
-                    class="w-full border rounded px-4 py-2"
-                >
-
-            </div>
-
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            >
-                Register
-            </button>
-
-        </form>
-
-        <p class="text-center mt-4 text-sm">
-
+        <p class="text-center mt-5 text-sm text-slate-600">
             Sudah punya akun?
-
-            <a
-                href="login.php"
-                class="text-blue-600 hover:underline"
-            >
-                Login
+            <a href="login.php" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                Masuk di sini
             </a>
-
         </p>
 
     </div>
