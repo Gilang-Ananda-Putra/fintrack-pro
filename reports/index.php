@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
+<<<<<<< HEAD
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
 
@@ -42,6 +43,30 @@ $availableYears = range($maxYear, $minYear);
 
 $reportStmt = $pdo->prepare(
     "SELECT
+=======
+require_once __DIR__ . '/../includes/functions.php';
+
+$userId = (int) ($_SESSION['user_id'] ?? 0);
+
+$month = filter_input(INPUT_GET, 'month', FILTER_VALIDATE_INT, [
+    'options' => ['min_range' => 1, 'max_range' => 12],
+]);
+$year = filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT, [
+    'options' => ['min_range' => 2000, 'max_range' => 2100],
+]);
+
+$currentMonth = (int) date('n');
+$currentYear  = (int) date('Y');
+
+$month = $month !== false && $month !== null ? (int) $month : $currentMonth;
+$year  = $year !== false && $year !== null ? (int) $year : $currentYear;
+
+$startDate = sprintf('%04d-%02d-01', $year, $month);
+$endDate   = date('Y-m-d', strtotime($startDate . ' +1 month'));
+
+$transactionStmt = $pdo->prepare(
+    'SELECT
+>>>>>>> 84010d7 (add folder)
         t.id,
         t.title,
         t.amount,
@@ -51,6 +76,7 @@ $reportStmt = $pdo->prepare(
      FROM transactions t
      LEFT JOIN categories c ON c.id = t.category_id
      WHERE t.user_id = :user_id
+<<<<<<< HEAD
        AND MONTH(t.transaction_date) = :month
        AND YEAR(t.transaction_date) = :year
      ORDER BY t.transaction_date DESC, t.id DESC"
@@ -228,5 +254,3 @@ $exportQuery = http_build_query([
         </main>
     </div>
 </div>
-</body>
-</html>
