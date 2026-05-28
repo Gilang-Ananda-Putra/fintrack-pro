@@ -3,6 +3,7 @@
 session_start();
 
 require '../config/database.php';
+require '../includes/functions.php';
 
 if (isset($_SESSION['user_id'])) {
     header('Location: ../dashboard/index.php');
@@ -12,12 +13,18 @@ if (isset($_SESSION['user_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = $_POST['csrf_token'] ?? '';
+
+    if (!is_string($csrfToken) || !verify_csrf_token($csrfToken)) {
+        $error = 'Token CSRF tidak valid. Silakan coba lagi.';
+    }
+
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($email === '' || $password === '') {
+    if ($error === '' && ($email === '' || $password === '')) {
         $error = 'Email dan password wajib diisi.';
-    } else {
+    } elseif ($error === '') {
         $query = 'SELECT id, password FROM users WHERE email = ? LIMIT 1';
         $stmt = $pdo->prepare($query);
         $stmt->execute([$email]);
@@ -52,6 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST" action="">
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"
+            >
+
             <div class="mb-4">
                 <label class="block mb-2" for="email">Email</label>
                 <input
