@@ -22,7 +22,10 @@ $categoryId = '';
 $note = '';
 $transactionDate = date('Y-m-d');
 
-$categoryStmt = $pdo->query('SELECT id, name FROM categories ORDER BY name ASC');
+$categoryStmt = $pdo->prepare(
+    'SELECT id, name FROM categories WHERE user_id = :user_id ORDER BY name ASC'
+);
+$categoryStmt->execute(['user_id' => $userId]);
 $categories = $categoryStmt->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -43,10 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Amount harus berupa angka dan lebih dari 0.';
     }
 
-    if ($type === '') {
-        $errors[] = 'Type wajib diisi.';
-    } elseif (!in_array($type, ['income', 'expense'], true)) {
-        $errors[] = 'Type tidak valid.';
+    if (!in_array($type, ['income', 'expense'], true)) {
+        $errors[] = 'Type wajib dipilih (income/expense).';
     }
 
     if ($categoryId === '') {
@@ -57,15 +58,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($transactionDate === '') {
         $errors[] = 'Tanggal transaksi wajib diisi.';
+    } else {
+        $date = DateTime::createFromFormat('Y-m-d', $transactionDate);
+        $dateErrors = DateTime::getLastErrors();
+
+        if (
+            $date === false
+            || $dateErrors['warning_count'] > 0
+            || $dateErrors['error_count'] > 0
+            || $date->format('Y-m-d') !== $transactionDate
+        ) {
+            $errors[] = 'Format tanggal transaksi tidak valid.';
+        }
     }
 
     if ($errors === []) {
-        $categoryCheckStmt = $pdo->prepare('SELECT id FROM categories WHERE id = :id LIMIT 1');
-        $categoryCheckStmt->execute(['id' => (int) $categoryId]);
+        $categoryCheckStmt = $pdo->prepare(
+            'SELECT id FROM categories WHERE id = :id AND user_id = :user_id LIMIT 1'
+        );
+        $categoryCheckStmt->execute([
+            'id' => (int) $categoryId,
+            'user_id' => $userId,
+        ]);
         $categoryExists = $categoryCheckStmt->fetchColumn();
 
         if ($categoryExists === false) {
-            $errors[] = 'Category tidak ditemukan.';
+            $errors[] = 'Category tidak ditemukan atau bukan milik user login.';
         }
     }
 
