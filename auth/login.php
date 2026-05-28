@@ -81,85 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include __DIR__ . '/../includes/head.php';
     ?>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
-
-    <div class="w-full max-w-md">
-
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 mb-4">
-                <span class="material-symbols-outlined text-white text-3xl">account_balance_wallet</span>
-            </div>
-            <h1 class="text-2xl font-bold text-slate-900"><?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8'); ?></h1>
-            <p class="text-sm text-slate-500 mt-1">Masuk ke akun Anda untuk melanjutkan</p>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-
-            <h2 class="text-xl font-semibold text-slate-900 mb-6">Masuk</h2>
-
-            <?php if ($error !== ''): ?>
-                <div class="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 p-4 mb-5 text-sm text-rose-700">
-                    <span class="material-symbols-outlined text-rose-500 text-[18px] mt-0.5 shrink-0">error</span>
-                    <span><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST" action="" novalidate>
-                <input
-                    type="hidden"
-                    name="csrf_token"
-                    value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"
-                >
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="email">
-                        Alamat Email
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
-                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                        placeholder="contoh@email.com"
-                        autocomplete="email"
-                        required
-                    >
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5" for="password">
-                        Password
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                        placeholder="••••••••"
-                        autocomplete="current-password"
-                        required
-                    >
-                </div>
-
-                <button
-                    type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition"
-                >
-                    Masuk
-                </button>
-            </form>
-
-        </div>
-
-        <p class="text-center mt-5 text-sm text-slate-600">
-            Belum punya akun?
-            <a href="register.php" class="font-semibold text-blue-600 hover:text-blue-700 hover:underline">
-                Daftar sekarang
-            </a>
-        </p>
-
-    </div>
-
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-lg p-8">
+<div class="text-center mb-6"><div class="w-12 h-12 rounded-lg bg-primary-container mx-auto flex items-center justify-center"><span class="material-symbols-outlined text-white">account_balance_wallet</span></div><h1 class="text-2xl font-bold mt-3">Welcome back</h1><p class="text-sm text-on-surface-variant">Masuk ke akun <?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8'); ?></p></div>
+<?php if ($error !== ''): ?><div class="mb-4 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 p-3 text-sm"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
+<form method="POST" action="" class="space-y-4"><input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"><div><label for="email" class="block text-sm mb-1">Email</label><input id="email" type="email" name="email" value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>" class="w-full rounded-lg border border-outline-variant px-3 py-2.5" required></div><div><label for="password" class="block text-sm mb-1">Password</label><input id="password" type="password" name="password" class="w-full rounded-lg border border-outline-variant px-3 py-2.5" required></div><button class="w-full rounded-lg bg-primary text-on-primary py-2.5 font-semibold">Masuk</button></form>
+<p class="text-center text-sm mt-5 text-on-surface-variant">Belum punya akun? <a href="register.php" class="text-primary font-semibold">Daftar sekarang</a></p></div>
 </body>
 </html>
