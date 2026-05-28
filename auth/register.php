@@ -4,6 +4,7 @@ session_start();
 
 require '../config/database.php';
 require '../config/app.php';
+require '../includes/functions.php';
 
 $error = '';
 $success = '';
@@ -12,6 +13,11 @@ $name = '';
 $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = $_POST['csrf_token'] ?? '';
+
+    if (!is_string($csrfToken) || !verify_csrf_token($csrfToken)) {
+        $error = 'Token CSRF tidak valid. Silakan coba lagi.';
+    }
 
     // Ambil data form
     $name = trim($_POST['name'] ?? '');
@@ -21,21 +27,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validasi kosong
     if (
-        $name === '' ||
-        $email === '' ||
-        $password === '' ||
-        $confirm_password === ''
+        $error === '' &&
+        (
+            $name === '' ||
+            $email === '' ||
+            $password === '' ||
+            $confirm_password === ''
+        )
     ) {
 
         $error = 'Semua field wajib diisi.';
 
     // Validasi konfirmasi password
-    } elseif ($password !== $confirm_password) {
+    } elseif ($error === '' && $password !== $confirm_password) {
 
         $error = 'Konfirmasi password tidak cocok.';
 
     // Validasi email sudah ada
-    } else {
+    } elseif ($error === '') {
 
         $checkQuery = 'SELECT id FROM users WHERE email = ? LIMIT 1';
         $checkStmt = $pdo->prepare($checkQuery);
@@ -110,6 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>"
+            >
 
             <div class="mb-4">
 
