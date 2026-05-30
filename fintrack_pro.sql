@@ -25,16 +25,20 @@ CREATE TABLE `users` (
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `google_id` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email_verified` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_users_email` (`email`)
+  UNIQUE KEY `uq_users_email` (`email`),
+  UNIQUE KEY `uq_users_google_id` (`google_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `users` */
 
-insert ignore into `users`(`name`,`email`,`password`,`created_at`,`updated_at`) values
-('Demo User','demo@fintrack.pro','$2y$10$wH6ehKko.L3yxDWbPdtvKe0y7LgWrCj3S4lW0LZfQ7bX1mER5eBym','2026-05-30 10:47:47',NULL);
+insert ignore into `users`(`name`,`email`,`password`,`email_verified`,`created_at`,`updated_at`) values
+('Demo User','demo@fintrack.pro','$2y$10$wH6ehKko.L3yxDWbPdtvKe0y7LgWrCj3S4lW0LZfQ7bX1mER5eBym',1,'2026-05-30 10:47:47',NULL);
 
 /*Table structure for table `categories` */
 
