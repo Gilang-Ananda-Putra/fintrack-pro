@@ -3,25 +3,14 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/auth_check.php';
-require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
-$month = filter_input(INPUT_GET, 'month', FILTER_VALIDATE_INT, [
-    'options' => ['min_range' => 1, 'max_range' => 12],
-]);
-$year = filter_input(INPUT_GET, 'year', FILTER_VALIDATE_INT);
-
+$month = (int) ($_GET['month'] ?? 0);
+$year = (int) ($_GET['year'] ?? 0);
 $currentYear = (int) date('Y');
 
-if ($userId <= 0) {
-    http_response_code(403);
-    header('Content-Type: text/plain; charset=UTF-8');
-    echo 'User tidak valid.';
-    exit;
-}
-
-if ($month === false || $month === null || $year === false || $year === null || $year < 2000 || $year > ($currentYear + 1)) {
+if ($month < 1 || $month > 12 || $year < 2000 || $year > ($currentYear + 1)) {
     http_response_code(400);
     header('Content-Type: text/plain; charset=UTF-8');
     echo 'Parameter month/year tidak valid.';
@@ -63,25 +52,7 @@ foreach ($transactions as $transaction) {
     }
 }
 
-$net = $totalIncome - $totalExpense;
-
-$monthNames = [
-    1 => 'Januari',
-    2 => 'Februari',
-    3 => 'Maret',
-    4 => 'April',
-    5 => 'Mei',
-    6 => 'Juni',
-    7 => 'Juli',
-    8 => 'Agustus',
-    9 => 'September',
-    10 => 'Oktober',
-    11 => 'November',
-    12 => 'Desember',
-];
-
-$periodLabel = sprintf('%s %04d', $monthNames[$month], $year);
-$generatedAt = date('d/m/Y H:i');
+$periodLabel = sprintf('%04d-%02d', $year, $month);
 
 header('Content-Type: text/html; charset=UTF-8');
 ?>
@@ -90,247 +61,96 @@ header('Content-Type: text/html; charset=UTF-8');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan <?= htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8'); ?> — <?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8'); ?></title>
+    <title>FinTrack Pro Report <?= htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
-        :root {
-            color-scheme: light;
-            --border: #d7dde8;
-            --muted: #64748b;
-            --text: #0f172a;
-            --income: #047857;
-            --expense: #be123c;
-            --net: #1d4ed8;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #f8fafc;
-            color: var(--text);
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .page {
-            width: min(100%, 960px);
-            margin: 24px auto;
-            padding: 32px;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-        }
-
-        .toolbar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .button {
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background: #0f172a;
-            color: #ffffff;
-            cursor: pointer;
-            display: inline-block;
-            font-weight: 700;
-            padding: 9px 14px;
-            text-decoration: none;
-        }
-
-        .button.secondary {
-            background: #ffffff;
-            color: #334155;
-        }
-
-        header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 24px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 28px;
-            margin: 0 0 6px;
-        }
-
-        .meta {
-            color: var(--muted);
-            margin: 0;
-        }
-
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 24px 0;
-        }
-
-        .card {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .card p {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            margin: 0 0 8px;
-            text-transform: uppercase;
-        }
-
-        .card strong {
-            display: block;
-            font-size: 20px;
-        }
-
-        .income {
-            color: var(--income);
-        }
-
-        .expense {
-            color: var(--expense);
-        }
-
-        .net {
-            color: var(--net);
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            border-bottom: 1px solid var(--border);
-            padding: 10px 8px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: #f1f5f9;
-            color: #334155;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .amount {
-            font-weight: 700;
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .empty {
-            color: var(--muted);
-            padding: 24px 8px;
-            text-align: center;
-        }
-
-        footer {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 24px;
-            text-align: right;
-        }
-
+        * { box-sizing: border-box; }
+        body { color: #0f172a; font-family: Arial, sans-serif; margin: 24px; }
+        .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 16px; }
+        button { background: #0f172a; border: 0; border-radius: 8px; color: #fff; cursor: pointer; padding: 10px 14px; }
+        h1 { font-size: 24px; margin: 0; }
+        .muted { color: #64748b; margin-top: 4px; }
+        .summary { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); margin: 24px 0; }
+        .card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; }
+        .label { color: #64748b; font-size: 12px; margin-bottom: 6px; }
+        .value { font-size: 20px; font-weight: 700; }
+        .income { color: #047857; }
+        .expense { color: #be123c; }
+        .net { color: #2563eb; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+        th { background: #f1f5f9; }
+        .text-right { text-align: right; }
         @media print {
-            body {
-                background: #ffffff;
-            }
-
-            .page {
-                border: 0;
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-            }
-
-            .toolbar {
-                display: none;
-            }
+            body { margin: 0; }
+            .toolbar { display: none; }
+            .card, table { break-inside: avoid; }
         }
     </style>
 </head>
 <body>
-    <main class="page">
-        <div class="toolbar" aria-label="Aksi laporan">
-            <a class="button secondary" href="index.php?month=<?= htmlspecialchars((string) $month, ENT_QUOTES, 'UTF-8'); ?>&amp;year=<?= htmlspecialchars((string) $year, ENT_QUOTES, 'UTF-8'); ?>">Kembali</a>
-            <button class="button" type="button" onclick="window.print()">Cetak / Simpan PDF</button>
+    <div class="toolbar">
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+
+    <header>
+        <h1>FinTrack Pro Report</h1>
+        <p class="muted">Periode: <?= htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8'); ?></p>
+    </header>
+
+    <section class="summary">
+        <div class="card">
+            <div class="label">Total Income</div>
+            <div class="value income">Rp <?= htmlspecialchars(number_format($totalIncome, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></div>
         </div>
+        <div class="card">
+            <div class="label">Total Expense</div>
+            <div class="value expense">Rp <?= htmlspecialchars(number_format($totalExpense, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></div>
+        </div>
+        <div class="card">
+            <div class="label">Net</div>
+            <div class="value net">Rp <?= htmlspecialchars(number_format($totalIncome - $totalExpense, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></div>
+        </div>
+    </section>
 
-        <header>
-            <div>
-                <h1>Laporan Keuangan</h1>
-                <p class="meta">Periode <?= htmlspecialchars($periodLabel, ENT_QUOTES, 'UTF-8'); ?></p>
-            </div>
-            <p class="meta">Dibuat: <?= htmlspecialchars($generatedAt, ENT_QUOTES, 'UTF-8'); ?></p>
-        </header>
-
-        <section class="summary" aria-label="Ringkasan laporan">
-            <div class="card">
-                <p>Total Pemasukan</p>
-                <strong class="income">Rp <?= htmlspecialchars(number_format($totalIncome, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></strong>
-            </div>
-            <div class="card">
-                <p>Total Pengeluaran</p>
-                <strong class="expense">Rp <?= htmlspecialchars(number_format($totalExpense, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></strong>
-            </div>
-            <div class="card">
-                <p>Net</p>
-                <strong class="net">Rp <?= htmlspecialchars(number_format($net, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></strong>
-            </div>
-        </section>
-
-        <table>
-            <thead>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Deskripsi</th>
+                <th>Kategori</th>
+                <th>Tipe</th>
+                <th class="text-right">Jumlah</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($transactions === []): ?>
                 <tr>
-                    <th>Tanggal</th>
-                    <th>Deskripsi</th>
-                    <th>Kategori</th>
-                    <th>Tipe</th>
-                    <th class="amount">Jumlah</th>
+                    <td colspan="5">Tidak ada transaksi pada periode ini.</td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php if ($transactions === []): ?>
+            <?php else: ?>
+                <?php foreach ($transactions as $transaction): ?>
+                    <?php
+                    $type = (string) ($transaction['type'] ?? '');
+                    $amount = (float) ($transaction['amount'] ?? 0);
+                    ?>
                     <tr>
-                        <td class="empty" colspan="5">Tidak ada transaksi pada periode ini.</td>
+                        <td><?= htmlspecialchars((string) ($transaction['transaction_date'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) ($transaction['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) ($transaction['category_name'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td class="<?= $type === 'income' ? 'income' : 'expense'; ?>"><?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td class="text-right">Rp <?= htmlspecialchars(number_format($amount, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
-                <?php else: ?>
-                    <?php foreach ($transactions as $transaction): ?>
-                        <?php
-                        $type = (string) ($transaction['type'] ?? '');
-                        $amount = (float) ($transaction['amount'] ?? 0);
-                        ?>
-                        <tr>
-                            <td><?= htmlspecialchars((string) ($transaction['transaction_date'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) ($transaction['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars((string) ($transaction['category_name'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td class="amount <?= $type === 'income' ? 'income' : 'expense'; ?>">Rp <?= htmlspecialchars(number_format($amount, 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-        <footer>
-            <?= htmlspecialchars(APP_NAME, ENT_QUOTES, 'UTF-8'); ?> — Halaman HTML print-friendly untuk cetak atau simpan sebagai PDF.
-        </footer>
-    </main>
+    <script>
+    window.addEventListener('load', () => {
+        if (window.location.search.includes('autoprint=1')) {
+            window.print();
+        }
+    });
+    </script>
 </body>
 </html>
