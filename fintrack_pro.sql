@@ -101,7 +101,7 @@ INSERT IGNORE INTO `users` (`name`, `email`, `password`, `email_verified`)
 VALUES (
   'Demo User',
   'demo@fintrack.pro',
-  '$2y$10$wH6ehKko.L3yxDWbPdtvKe0y7LgWrCj3S4lW0LZfQ7bX1mER5eBym',
+  '$2y$12$uUK2PRnP9CxcPbJcW1rr3eGnxwyv4Ct5K8NbR2YSQ0t8wQjXXTzq2',
   1
 );
 
