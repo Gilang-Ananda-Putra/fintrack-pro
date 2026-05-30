@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/env.php';
+
 define('APP_NAME', 'FinTrack Pro');
 $baseUrl = $_ENV['APP_URL'] ?? getenv('APP_URL') ?: 'http://localhost/fintrack-pro';
 
