@@ -16,6 +16,26 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/`fintrack_pro` /*!40100 DEFAULT CHARACTE
 
 USE `fintrack_pro`;
 
+/*Table structure for table `users` */
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_users_email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `users` */
+
+insert ignore into `users`(`name`,`email`,`password`,`created_at`,`updated_at`) values
+('Demo User','demo@fintrack.pro','$2y$10$wH6ehKko.L3yxDWbPdtvKe0y7LgWrCj3S4lW0LZfQ7bX1mER5eBym','2026-05-30 10:47:47',NULL);
+
 /*Table structure for table `categories` */
 
 DROP TABLE IF EXISTS `categories`;
@@ -38,18 +58,23 @@ CREATE TABLE `categories` (
 
 /*Data for the table `categories` */
 
-insert  into `categories`(`id`,`user_id`,`name`,`type`,`color`,`icon`,`description`,`created_at`,`updated_at`) values 
-(1,1,'Gaji','income','#006e2f','payments','Gaji bulanan dan bonus','2026-05-30 10:47:47',NULL),
-(2,1,'Freelance','income','#0ea5e9','laptop_mac','Pendapatan dari pekerjaan sampingan','2026-05-30 10:47:47',NULL),
-(3,1,'Investasi','income','#8b5cf6','trending_up','Dividen, bunga deposito, reksa dana','2026-05-30 10:47:47',NULL),
-(4,1,'Makanan & Minuman','expense','#ba1a1a','restaurant','Makan, minum, kopi, snack','2026-05-30 10:47:47',NULL),
-(5,1,'Transportasi','expense','#dc2626','directions_car','Bensin, parkir, ojek, transport umum','2026-05-30 10:47:47',NULL),
-(6,1,'Tagihan & Utilitas','expense','#7c3aed','receipt_long','Listrik, air, internet, pulsa','2026-05-30 10:47:47',NULL),
-(7,1,'Belanja','expense','#db2777','shopping_bag','Pakaian, elektronik, kebutuhan rumah','2026-05-30 10:47:47',NULL),
-(8,1,'Kesehatan','expense','#0891b2','health_and_safety','Obat, dokter, vitamin','2026-05-30 10:47:47',NULL),
-(9,1,'Hiburan','expense','#65a30d','movie','Film, game, konser, streaming','2026-05-30 10:47:47',NULL),
-(10,1,'Pendidikan','expense','#2563eb','school','Kursus, buku, biaya sekolah','2026-05-30 10:47:47',NULL),
-(11,1,'Tabungan','expense','#059669','savings','Transfer ke rekening tabungan','2026-05-30 10:47:47',NULL);
+insert ignore into `categories`(`user_id`,`name`,`type`,`color`,`icon`,`description`,`created_at`,`updated_at`)
+select u.`id`, demo_categories.`name`, demo_categories.`type`, demo_categories.`color`, demo_categories.`icon`, demo_categories.`description`, demo_categories.`created_at`, demo_categories.`updated_at`
+from `users` u
+cross join (
+  select 'Gaji' as `name`, 'income' as `type`, '#006e2f' as `color`, 'payments' as `icon`, 'Gaji bulanan dan bonus' as `description`, '2026-05-30 10:47:47' as `created_at`, NULL as `updated_at`
+  union all select 'Freelance', 'income', '#0ea5e9', 'laptop_mac', 'Pendapatan dari pekerjaan sampingan', '2026-05-30 10:47:47', NULL
+  union all select 'Investasi', 'income', '#8b5cf6', 'trending_up', 'Dividen, bunga deposito, reksa dana', '2026-05-30 10:47:47', NULL
+  union all select 'Makanan & Minuman', 'expense', '#ba1a1a', 'restaurant', 'Makan, minum, kopi, snack', '2026-05-30 10:47:47', NULL
+  union all select 'Transportasi', 'expense', '#dc2626', 'directions_car', 'Bensin, parkir, ojek, transport umum', '2026-05-30 10:47:47', NULL
+  union all select 'Tagihan & Utilitas', 'expense', '#7c3aed', 'receipt_long', 'Listrik, air, internet, pulsa', '2026-05-30 10:47:47', NULL
+  union all select 'Belanja', 'expense', '#db2777', 'shopping_bag', 'Pakaian, elektronik, kebutuhan rumah', '2026-05-30 10:47:47', NULL
+  union all select 'Kesehatan', 'expense', '#0891b2', 'health_and_safety', 'Obat, dokter, vitamin', '2026-05-30 10:47:47', NULL
+  union all select 'Hiburan', 'expense', '#65a30d', 'movie', 'Film, game, konser, streaming', '2026-05-30 10:47:47', NULL
+  union all select 'Pendidikan', 'expense', '#2563eb', 'school', 'Kursus, buku, biaya sekolah', '2026-05-30 10:47:47', NULL
+  union all select 'Tabungan', 'expense', '#059669', 'savings', 'Transfer ke rekening tabungan', '2026-05-30 10:47:47', NULL
+) demo_categories
+where u.`email` = 'demo@fintrack.pro';
 
 /*Table structure for table `transactions` */
 
@@ -77,26 +102,6 @@ CREATE TABLE `transactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `transactions` */
-
-/*Table structure for table `users` */
-
-DROP TABLE IF EXISTS `users`;
-
-CREATE TABLE `users` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_users_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `users` */
-
-insert  into `users`(`id`,`name`,`email`,`password`,`created_at`,`updated_at`) values 
-(1,'Demo User','demo@fintrack.pro','$2y$10$wH6ehKko.L3yxDWbPdtvKe0y7LgWrCj3S4lW0LZfQ7bX1mER5eBym','2026-05-30 10:47:47',NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
