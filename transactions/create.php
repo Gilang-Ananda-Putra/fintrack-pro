@@ -23,7 +23,7 @@ $note = '';
 $transactionDate = date('Y-m-d');
 
 $categoryStmt = $pdo->prepare(
-    'SELECT id, name FROM categories WHERE user_id = :user_id ORDER BY name ASC'
+    'SELECT id, name, type FROM categories WHERE user_id = :user_id ORDER BY type ASC, name ASC'
 );
 $categoryStmt->execute(['user_id' => $userId]);
 $categories = $categoryStmt->fetchAll();
@@ -177,8 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <select id="category_id" name="category_id" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>
                                     <option value="">Pilih category</option>
                                     <?php foreach ($categories as $category): ?>
-                                        <option value="<?= htmlspecialchars((string) $category['id'], ENT_QUOTES, 'UTF-8'); ?>" <?= $categoryId === (string) $category['id'] ? 'selected' : ''; ?>>
-                                            <?= htmlspecialchars((string) $category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                        <option value="<?= htmlspecialchars((string) $category['id'], ENT_QUOTES, 'UTF-8'); ?>" data-type="<?= htmlspecialchars((string) $category['type'], ENT_QUOTES, 'UTF-8'); ?>" <?= $categoryId === (string) $category['id'] ? 'selected' : ''; ?>>
+                                            <?= htmlspecialchars((string) $category['name'], ENT_QUOTES, 'UTF-8'); ?> (<?= htmlspecialchars((string) $category['type'], ENT_QUOTES, 'UTF-8'); ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -200,5 +200,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </main>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const typeSelect = document.getElementById('type');
+    const categorySelect = document.getElementById('category_id');
+
+    if (!typeSelect || !categorySelect) {
+        return;
+    }
+
+    const filterCategoryOptions = () => {
+        const selectedType = typeSelect.value;
+
+        Array.from(categorySelect.options).forEach((option) => {
+            const optionType = option.dataset.type;
+
+            if (!optionType) {
+                option.hidden = false;
+                option.disabled = false;
+                return;
+            }
+
+            const shouldShow = optionType === selectedType;
+            option.hidden = !shouldShow;
+            option.disabled = !shouldShow;
+        });
+
+        const selectedCategory = categorySelect.selectedOptions[0];
+
+        if (selectedCategory && selectedCategory.dataset.type && selectedCategory.dataset.type !== selectedType) {
+            categorySelect.value = '';
+        }
+    };
+
+    typeSelect.addEventListener('change', filterCategoryOptions);
+    filterCategoryOptions();
+});
+</script>
 </body>
 </html>
