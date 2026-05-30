@@ -93,6 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $date = DateTime::createFromFormat('Y-m-d', $transactionDate);
         $dateErrors = DateTime::getLastErrors();
+        if ($dateErrors === false) {
+            $dateErrors = ['warning_count' => 0, 'error_count' => 0];
+        }
 
         if (
             $date === false
