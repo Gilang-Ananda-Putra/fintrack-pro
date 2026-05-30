@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $categoryExists = $categoryCheckStmt->fetchColumn();
 
         if ($categoryExists === false) {
-            $errors[] = 'Category tidak ditemukan atau bukan milik user login.';
+            $errors[] = 'Kategori tidak ditemukan, bukan milik Anda, atau tidak sesuai dengan tipe transaksi.';
         }
     }
 
