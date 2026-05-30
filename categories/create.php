@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
 $errors = [];
@@ -20,9 +21,14 @@ $supportsType = in_array('type', $categoryColumns, true);
 $supportsDescription = in_array('description', $categoryColumns, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = (string) ($_POST['csrf_token'] ?? '');
     $name = trim((string) ($_POST['name'] ?? ''));
     $type = trim((string) ($_POST['type'] ?? ''));
     $description = trim((string) ($_POST['description'] ?? ''));
+
+    if (!verify_csrf_token($csrfToken)) {
+        $errors[] = 'Token keamanan tidak valid. Silakan muat ulang halaman.';
+    }
 
     if ($name === '') {
         $errors[] = 'Nama kategori wajib diisi.';
@@ -113,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
                     <form method="POST" action="" class="space-y-5">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                         <div>
                             <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Kategori</label>
                             <input id="name" name="name" type="text" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200" required>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
 if ($userId <= 0) {
@@ -13,6 +14,13 @@ if ($userId <= 0) {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error_message'] = 'Method tidak diizinkan.';
+    header('Location: index.php');
+    exit;
+}
+
+$csrfToken = (string) ($_POST['csrf_token'] ?? '');
+if (!verify_csrf_token($csrfToken)) {
+    $_SESSION['error_message'] = 'Token keamanan tidak valid. Silakan muat ulang halaman.';
     header('Location: index.php');
     exit;
 }
