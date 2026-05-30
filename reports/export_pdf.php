@@ -333,4 +333,3 @@ header('Content-Type: text/html; charset=UTF-8');
         </footer>
     </main>
 </body>
-</html>
