@@ -33,29 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($errors === []) {
-        if ($supportsType) {
-            $duplicateStmt = $pdo->prepare(
-                'SELECT id FROM categories WHERE user_id = :user_id AND name = :name AND type = :type LIMIT 1'
-            );
-            $duplicateStmt->execute([
-                'user_id' => $userId,
-                'name' => $name,
-                'type' => $type,
-            ]);
-        } else {
-            $duplicateStmt = $pdo->prepare(
-                'SELECT id FROM categories WHERE user_id = :user_id AND name = :name LIMIT 1'
-            );
-            $duplicateStmt->execute([
-                'user_id' => $userId,
-                'name' => $name,
-            ]);
-        }
+        $duplicateStmt = $pdo->prepare(
+            'SELECT id FROM categories WHERE user_id = :user_id AND LOWER(name) = LOWER(:name) LIMIT 1'
+        );
+
+        $duplicateStmt->execute([
+            'user_id' => $userId,
+            'name' => $name,
+        ]);
 
         if ($duplicateStmt->fetchColumn() !== false) {
-            $errors[] = $supportsType
-                ? 'Nama kategori untuk type tersebut sudah ada.'
-                : 'Nama kategori sudah ada.';
+            $errors[] = 'Nama kategori sudah ada.';
         }
     }
 

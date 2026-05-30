@@ -55,13 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 }
 
 $listStmt = $pdo->prepare(
-    'SELECT c.id, c.name, c.color, c.icon,
-            COUNT(t.id) AS usage_count,
-            MAX(t.type) AS type_sample
+    'SELECT c.id, c.name, c.type, c.color, c.icon, c.description,
+            COUNT(t.id) AS usage_count
      FROM categories c
      LEFT JOIN transactions t ON t.category_id = c.id AND t.user_id = c.user_id
      WHERE c.user_id = :user_id
-     GROUP BY c.id, c.name, c.color, c.icon
+     GROUP BY c.id, c.name, c.type, c.color, c.icon, c.description
      ORDER BY c.name ASC'
 );
 $listStmt->execute(['user_id' => $userId]);
@@ -133,7 +132,7 @@ $categories = $listStmt->fetchAll();
                                 <?php foreach ($categories as $index => $category): ?>
                                     <?php
                                     $catId = (int) $category['id'];
-                                    $type = (string) ($category['type_sample'] ?? '');
+                                    $type = (string) ($category['type'] ?? '');
                                     $typeLabel = $type !== '' ? $type : '-';
                                     $description = [];
                                     if (!empty($category['color'])) {
@@ -143,6 +142,9 @@ $categories = $listStmt->fetchAll();
                                         $description[] = 'Ikon: ' . (string) $category['icon'];
                                     }
                                     $description[] = 'Dipakai: ' . (string) ((int) $category['usage_count']) . ' transaksi';
+                                    if (!empty($category['description'])) {
+                                        $description[] = (string) $category['description'];
+                                    }
                                     ?>
                                     <tr class="hover:bg-slate-50 transition">
                                         <td class="px-4 py-3"><?= $index + 1; ?></td>

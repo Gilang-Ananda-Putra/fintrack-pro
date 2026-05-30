@@ -74,11 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($errors === []) {
         $categoryCheckStmt = $pdo->prepare(
-            'SELECT id FROM categories WHERE id = :id AND user_id = :user_id LIMIT 1'
+            'SELECT id FROM categories WHERE id = :id AND user_id = :user_id AND type = :type LIMIT 1'
         );
         $categoryCheckStmt->execute([
             'id' => (int) $categoryId,
             'user_id' => $userId,
+            'type' => $type,
         ]);
         $categoryExists = $categoryCheckStmt->fetchColumn();
 
