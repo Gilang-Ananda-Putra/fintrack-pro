@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
 if ($userId <= 0) {
@@ -55,12 +56,17 @@ $note = (string) ($transaction['note'] ?? '');
 $transactionDate = (string) $transaction['transaction_date'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = (string) ($_POST['csrf_token'] ?? '');
     $title = trim((string) ($_POST['title'] ?? ''));
     $amount = trim((string) ($_POST['amount'] ?? ''));
     $type = trim((string) ($_POST['type'] ?? ''));
     $categoryId = trim((string) ($_POST['category_id'] ?? ''));
     $note = trim((string) ($_POST['note'] ?? ''));
     $transactionDate = trim((string) ($_POST['transaction_date'] ?? ''));
+
+    if (!verify_csrf_token($csrfToken)) {
+        $errors[] = 'Token keamanan tidak valid. Silakan muat ulang halaman.';
+    }
 
     if ($title === '') {
         $errors[] = 'Title wajib diisi.';
@@ -172,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
                     <form method="POST" action="" class="space-y-5">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) $transactionIdInt, ENT_QUOTES, 'UTF-8'); ?>">
 
                         <div>

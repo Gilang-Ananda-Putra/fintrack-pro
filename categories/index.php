@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $userId = (int) ($_SESSION['user_id'] ?? 0);
 
@@ -22,7 +23,14 @@ if (isset($_SESSION['error_message']) && is_string($_SESSION['error_message'])) 
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    $csrfToken = (string) ($_POST['csrf_token'] ?? '');
     $categoryId = trim((string) ($_POST['id'] ?? ''));
+
+    if (!verify_csrf_token($csrfToken)) {
+        $_SESSION['error_message'] = 'Token keamanan tidak valid. Silakan muat ulang halaman.';
+        header('Location: index.php');
+        exit;
+    }
 
     if (!ctype_digit($categoryId)) {
         $_SESSION['error_message'] = 'ID kategori tidak valid.';
@@ -155,6 +163,7 @@ $categories = $listStmt->fetchAll();
                                             <div class="flex items-center justify-center gap-2">
                                                 <a href="edit.php?id=<?= $catId; ?>" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">Edit</a>
                                                 <form method="POST" action="index.php" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                                                     <input type="hidden" name="action" value="delete">
                                                     <input type="hidden" name="id" value="<?= $catId; ?>">
                                                     <button type="submit" class="inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 transition">Delete</button>

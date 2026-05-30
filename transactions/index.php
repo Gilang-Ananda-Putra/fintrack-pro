@@ -299,6 +299,7 @@ $buildPageUrl = static function (int $targetPage) use ($queryBase): string {
                                                         action="delete.php"
                                                         onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')"
                                                     >
+                                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                                                         <input type="hidden" name="id" value="<?= $trxId; ?>">
                                                         <button
                                                             type="submit"

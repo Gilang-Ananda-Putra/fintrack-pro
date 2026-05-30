@@ -45,9 +45,14 @@ $errorMessage = '';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = (string) ($_POST['csrf_token'] ?? '');
     $name = trim((string) ($_POST['name'] ?? ''));
     $type = trim((string) ($_POST['type'] ?? ''));
     $description = trim((string) ($_POST['description'] ?? ''));
+
+    if (!verify_csrf_token($csrfToken)) {
+        $errors[] = 'Token keamanan tidak valid. Silakan muat ulang halaman.';
+    }
 
     if ($name === '') {
         $errors[] = 'Nama kategori wajib diisi.';
@@ -141,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <section class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
                     <form method="POST" action="" class="space-y-5">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                         <input type="hidden" name="id" value="<?= htmlspecialchars((string) $categoryId, ENT_QUOTES, 'UTF-8'); ?>">
 
                         <div>
