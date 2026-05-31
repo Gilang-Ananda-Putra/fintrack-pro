@@ -183,6 +183,7 @@ $exportQuery = http_build_query([
                             </a>
                             <a href="export_pdf.php?<?= htmlspecialchars($exportQuery, ENT_QUOTES, 'UTF-8'); ?>" class="inline-flex items-center rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-700">
                                 Export PDF
+                            </a>
                             <a href="export_excel.php?<?= htmlspecialchars($exportQuery, ENT_QUOTES, 'UTF-8'); ?>" class="inline-flex items-center rounded-lg border border-emerald-300 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">
                                 Export Excel
                             </a>
@@ -213,3 +214,25 @@ $exportQuery = http_build_query([
                                     <tr>
                                         <td class="px-4 py-3 text-slate-700"><?= htmlspecialchars((string) $transaction['transaction_date'], ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td class="px-4 py-3 text-slate-900 font-medium"><?= htmlspecialchars((string) $transaction['title'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="px-4 py-3 text-slate-600"><?= htmlspecialchars((string) ($transaction['category_name'] ?? '—'), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="px-4 py-3">
+                                            <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold <?= $transaction['type'] === 'income' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'; ?>">
+                                                <?= htmlspecialchars(ucfirst((string) $transaction['type']), ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-right font-semibold <?= $transaction['type'] === 'income' ? 'text-emerald-600' : 'text-rose-600'; ?>">
+                                            Rp <?= htmlspecialchars(number_format((float) $transaction['amount'], 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>
